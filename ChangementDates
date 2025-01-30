@@ -1,0 +1,89 @@
+Option Explicit
+Option Base 1
+
+
+Sub Dates_YTD()
+    ' Déclaration des variables
+    Dim dateFin As Date
+    Dim dateDebut As Date
+    Dim dernierJourAnneePrecedente As Date
+    
+    ' Récupérer la date de fin (rDateFin)
+    dateFin = Range("rDateFin").Value
+    
+    ' Calcul du dernier jour de l'année précédente par rapport à la date de fin
+    dernierJourAnneePrecedente = DateSerial(Year(dateFin) - 1, 12, 29)
+    
+    ' Utiliser WorksheetFunction.WorkDay pour obtenir le dernier jour ouvré de l'année précédente
+    dateDebut = WorksheetFunction.WorkDay(dernierJourAnneePrecedente, 0)
+    
+    ' Modifier la cellule rDateDebut avec la nouvelle date de début (dernier jour ouvré)
+    Range("rDateDebut").Value = dateDebut
+    
+    ' Mettre à jour le graphique après avoir modifié la Date Début
+    Call GraphiqueIndices_V2
+End Sub
+
+Sub Dates_3Y()
+    ' Modifie la Date Début au dernier jour ouvré 3 ans avant la Date Fin
+    Dim dateFin As Date
+    Dim dateDebut As Date
+    Dim dernierJour3Y As Date
+    
+    dateFin = Range("rDateFin").Value
+    dernierJour3Y = DateSerial(Year(dateFin) - 3, 12, 31)
+    dateDebut = WorksheetFunction.WorkDay(dernierJour3Y, 0)
+    Range("rDateDebut").Value = dateDebut
+    ' Mettre à jour le graphique après avoir modifié la Date Début
+    Call GraphiqueIndices_V2
+End Sub
+
+Sub Dates_5Y()
+    ' Modifie la Date Début au dernier jour ouvré 5 ans avant la Date Fin
+    Dim dateFin As Date
+    Dim dateDebut As Date
+    Dim dernierJour5Y As Date
+    
+    dateFin = Range("rDateFin").Value
+    dernierJour5Y = DateSerial(Year(dateFin) - 5, 12, 31)
+    dateDebut = WorksheetFunction.WorkDay(dernierJour5Y, 0)
+    Range("rDateDebut").Value = dateDebut
+    ' Mettre à jour le graphique après avoir modifié la Date Début
+    Call GraphiqueIndices_V2
+End Sub
+
+Sub Dates_10Y()
+    ' Modifie la Date Début au dernier jour ouvré 10 ans avant la Date Fin
+    Dim dateFin As Date
+    Dim dateDebut As Date
+    Dim dernierJour10Y As Date
+    
+    dateFin = Range("rDateFin").Value
+    dernierJour10Y = DateSerial(Year(dateFin) - 10, 12, 31)
+    dateDebut = WorksheetFunction.WorkDay(dernierJour10Y, 0)
+    Range("rDateDebut").Value = dateDebut
+    ' Mettre à jour le graphique après avoir modifié la Date Début
+    Call GraphiqueIndices_V2
+End Sub
+
+Sub Dates_15Y()
+    ' Modifie la Date Début au dernier jour ouvré 15 ans avant la Date Fin
+    Dim dateFin As Date
+    Dim dateDebut As Date
+    Dim dernierJour15Y As Date
+    
+    dateFin = Range("rDateFin").Value
+    dernierJour15Y = DateSerial(Year(dateFin) - 15, 12, 31)
+    dateDebut = WorksheetFunction.WorkDay(dernierJour15Y, 0)
+    Range("rDateDebut").Value = dateDebut
+    ' Mettre à jour le graphique après avoir modifié la Date Début
+    Call GraphiqueIndices_V2
+End Sub
+
+Sub Dates_Max()
+    ' Modifie la Date Début à 31/12/1999
+    Range("rDateDebut").Value = DateSerial(1999, 12, 31)
+    ' Mettre à jour le graphique après avoir modifié la Date Début
+    Call GraphiqueIndices_V2
+End Sub
+
