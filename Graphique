@@ -1,0 +1,250 @@
+Option Explicit
+Option Base 1
+
+Sub GraphiqueIndices_V1()
+
+ Dim ws As Worksheet
+    Dim legraphique As ChartObject
+    Dim rDate As Range
+    Dim rDatas As Range
+    Dim MaSerie As Series
+    Dim i As Integer
+    Dim IndiceNom As Variant
+    Dim DerniereLigne As Long
+    Dim ys As Worksheet
+    
+    
+    Set ys = ThisWorkbook.Worksheets("Interface")
+    ' Définir les noms des indices
+    IndiceNom = Array(ys.Range("C13").Value, ys.Range("D13").Value, ys.Range("E13").Value)
+    
+    Set ws = ThisWorkbook.Worksheets("DatasRebased")
+
+    ' Supprime les graphiques existants
+    On Error Resume Next
+    ThisWorkbook.Worksheets("Interface").ChartObjects.Delete
+    On Error GoTo 0
+
+    ' On crée le graphe
+    Set legraphique = ThisWorkbook.Worksheets("Interface").ChartObjects.Add(300, 15, 600, 250)
+    legraphique.Chart.ChartType = xlLine
+    
+    With ws
+        
+        ' Détermine la dernière ligne non vide dans la colonne A (pour les dates)
+        DerniereLigne = .Cells(.Rows.Count, 1).End(xlUp).Row
+        
+        ' On détermine la plage des dates
+        Set rDate = .Range(.Cells(2, 1), .Cells(DerniereLigne, 1))
+        
+        ' Boucle sur les colonnes B à D (indices)
+        For i = 2 To 4
+            
+            ' On détermine la plage des données pour l'indice actuel
+            Set rDatas = .Range(.Cells(2, i), .Cells(DerniereLigne, i))
+            
+            ' Création de la série
+            Set MaSerie = legraphique.Chart.SeriesCollection.NewSeries
+            With MaSerie
+                .Values = rDatas
+                .XValues = rDate
+                .Name = IndiceNom(i - 1) ' Nom de la série (CAC 40, Euro Stoxx 50, S&P 500)
+            End With
+            
+        Next i
+        
+    End With
+    
+    ' Mise en forme du graphique (facultatif)
+    With legraphique.Chart
+        .HasTitle = True
+        .ChartTitle.Text = "Comparaison des Indices Rebasés"
+        .Axes(xlCategory).HasTitle = True
+        .Axes(xlCategory).AxisTitle.Text = "Date"
+        .Axes(xlValue).HasTitle = True
+        .Axes(xlValue).AxisTitle.Text = "Valeur Rebasée"
+    End With
+
+End Sub
+
+Sub GraphiqueIndices_V3()
+
+    Dim ws As Worksheet
+    Dim legraphique As ChartObject
+    Dim rDate As Range
+    Dim rDatas As Range
+    Dim MaSerie As Series
+    Dim i As Integer
+    Dim IndiceNom As Variant
+    Dim ligneDebut As Long
+    Dim ligneFin As Long
+
+     Dim ys As Worksheet
+    Set ys = ThisWorkbook.Worksheets("Interface")
+    ' Définir les noms des indices
+    IndiceNom = Array(ys.Range("C13").Value, ys.Range("D13").Value, ys.Range("E13").Value)
+    
+    ' Définir l'onglet source des données rebasées
+    Set ws = ThisWorkbook.Worksheets("DatasRebased")
+
+    ' Récupérer les lignes de début et de fin en fonction des dates
+    ligneDebut = Range("rLigneDateDebut").Value
+    ligneFin = Range("rLigneDateFin").Value
+    
+    ' Supprimer les graphiques existants dans l'onglet Interface
+    On Error Resume Next
+    ThisWorkbook.Worksheets("Interface").ChartObjects.Delete
+    On Error GoTo 0
+
+    ' Créer le graphique dans l'onglet Interface
+    Set legraphique = ThisWorkbook.Worksheets("Interface").ChartObjects.Add(300, 15, 600, 250)
+    legraphique.Chart.ChartType = xlLine
+
+    With ws
+        
+        ' Sélectionner la plage des dates entre ligneDebut et ligneFin
+        Set rDate = .Range(.Cells(ligneDebut, 1), .Cells(ligneFin, 1))
+        
+        ' Boucle sur les colonnes B à D (indices) pour ajouter les séries
+        For i = 2 To 4
+            
+            ' Définir la plage de données de chaque indice
+            Set rDatas = .Range(.Cells(ligneDebut, i), .Cells(ligneFin, i))
+            
+            ' Ajouter une nouvelle série au graphique
+            Set MaSerie = legraphique.Chart.SeriesCollection.NewSeries
+            With MaSerie
+                .Values = rDatas
+                .XValues = rDate
+                .Name = IndiceNom(i - 1) ' Correspond à CAC 40, Euro Stoxx 50, S&P 500
+            End With
+            
+        Next i
+        
+    End With
+
+    ' Mise en forme du graphique
+    With legraphique.Chart
+        .HasTitle = True
+        .ChartTitle.Text = "Indices Rebasés Entre " & Range("rDateDebut").Value & " et " & Range("rDateFin").Value
+        .Axes(xlCategory).HasTitle = True
+        .Axes(xlCategory).AxisTitle.Text = "Date"
+        .Axes(xlValue).HasTitle = True
+        .Axes(xlValue).AxisTitle.Text = "Valeur Rebasée"
+    End With
+
+End Sub
+
+Sub GraphiqueIndices_V2()
+    Dim ws As Worksheet
+    Dim legraphique As ChartObject
+    Dim rDate As Range
+    Dim rDatas As Range
+    Dim MaSerie As Series
+    Dim i As Integer
+    Dim IndiceNom As Variant
+    Dim ligneDebut As Long
+    Dim ligneFin As Long
+    Dim MinValue As Double
+    Dim MaxValue As Double
+    Dim CurrentValue As Double
+    Dim IsLogScale As Boolean
+    Dim cell As Range ' Pour parcourir les cellules dans la plage des données
+
+    Dim ys As Worksheet
+    Set ys = ThisWorkbook.Worksheets("Interface")
+    ' Définir les noms des indices
+    IndiceNom = Array(ys.Range("C13").Value, ys.Range("D13").Value, ys.Range("E13").Value)
+    Set ws = ThisWorkbook.Worksheets("DatasRebased")
+    
+    
+    ' Récupérer les lignes de début et de fin en fonction des dates
+    ligneDebut = Range("rLigneDateDebut").Value
+    ligneFin = Range("rLigneDateFin").Value
+    
+    ' Vérifier les plages dynamiques
+    If ligneDebut = 0 Or ligneFin = 0 Then
+        MsgBox "Les plages rLigneDateDebut ou rLigneDateFin ne sont pas correctement définies.", vbCritical
+        Exit Sub
+    End If
+    
+    ' Vérifier l'échelle logarithmique
+    IsLogScale = (Range("rEchelleLog").Value)
+
+    ' Supprimer les graphiques existants
+    On Error Resume Next
+    ThisWorkbook.Worksheets("Interface").ChartObjects.Delete
+    On Error GoTo 0
+
+    ' Créer un nouveau graphique
+    Set legraphique = ThisWorkbook.Worksheets("Interface").ChartObjects.Add(350, 15, 600, 250)
+    legraphique.Chart.ChartType = xlLine
+
+    ' Initialiser les valeurs Min et Max
+    MinValue = 1E+308
+    MaxValue = -1E+308
+
+    ' Ajouter les séries et rechercher les Min/Max
+    For i = 2 To 4
+        ' Plage des données
+        Set rDatas = ws.Range(ws.Cells(ligneDebut, i), ws.Cells(ligneFin, i))
+
+        ' Ajouter une série au graphique
+        Set MaSerie = legraphique.Chart.SeriesCollection.NewSeries
+        With MaSerie
+            .Values = rDatas
+            .XValues = ws.Range(ws.Cells(ligneDebut, 1), ws.Cells(ligneFin, 1))
+            .Name = IndiceNom(i - 1)
+        End With
+
+        ' Trouver les Min et Max
+        For Each cell In rDatas
+            If IsNumeric(cell.Value) Then
+                CurrentValue = cell.Value
+                If CurrentValue < MinValue Then MinValue = CurrentValue
+                If CurrentValue > MaxValue Then MaxValue = CurrentValue
+            End If
+        Next cell
+    Next i
+
+    ' Afficher les Min et Max pour vérifier
+    Debug.Print "MinValue: " & MinValue
+    Debug.Print "MaxValue: " & MaxValue
+
+    ' Calcul des limites d'axe
+    Dim MinAxis As Double
+    Dim MaxAxis As Double
+    MinAxis = WorksheetFunction.Floor(0.9 * MinValue, 10)
+    MaxAxis = WorksheetFunction.Ceiling(1.1 * MaxValue, 10)
+
+    ' Afficher les limites pour confirmer
+    Debug.Print "MinAxis: " & MinAxis
+    Debug.Print "MaxAxis: " & MaxAxis
+
+    ' Configurer l'axe des ordonnées
+    With legraphique.Chart.Axes(xlValue)
+        .MinimumScale = MinAxis
+        .MaximumScale = MaxAxis
+        If IsLogScale Then
+            .ScaleType = xlLogarithmic
+            .HasMinorGridlines = True
+        Else
+            .ScaleType = xlLinear
+        End If
+    End With
+
+    ' Ajouter des titres
+    With legraphique.Chart
+        .HasTitle = True
+        .ChartTitle.Text = "Indices Rebasés Entre " & Range("rDateDebut").Value & " et " & Range("rDateFin").Value
+        .Axes(xlCategory).HasTitle = True
+        .Axes(xlCategory).AxisTitle.Text = "Date"
+        .Axes(xlValue).HasTitle = True
+        .Axes(xlValue).AxisTitle.Text = "Valeur Rebasée"
+    End With
+
+    ' Vérification de l'échelle logarithmique
+    Debug.Print "Échelle logarithmique : " & IsLogScale
+End Sub
+
+
