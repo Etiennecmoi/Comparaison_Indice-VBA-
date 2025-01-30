@@ -1,0 +1,58 @@
+Option Explicit
+
+Sub DeuxEnUn()
+    ' Exécute les macros RecuperationAll et GraphiqueIndices_V2
+    Call RecuperationAll
+    Call GraphiqueIndices_V2
+End Sub
+
+Sub ChoixAutomatique()
+    Dim choix As String
+
+    ' Demander à l'utilisateur de choisir une catégorie
+    choix = InputBox("Veuillez choisir une catégorie : " & vbCrLf & _
+                     "1. Indices" & vbCrLf & _
+                     "2. Indices GR" & vbCrLf & _
+                     "3. High Yield/Inflation" & vbCrLf & _
+                     "4. Immo/Inflation" & vbCrLf & _
+                     "5. Zone Euro" & vbCrLf & _
+                     "6. Zone US", "Choix de la catégorie")
+
+    ' Modifier les cellules C13, D13 et E13 en fonction du choix
+    Select Case choix
+        Case "1", "Indices"
+            Range("C13").Value = "CAC 40"
+            Range("D13").Value = "Euro Stoxx 50"
+            Range("E13").Value = "S&P 500"
+        Case "2", "Indices GR"
+            Range("C13").Value = "CAC 40 GR"
+            Range("D13").Value = "DAX"
+            Range("E13").Value = "S&P 500 GR"
+        Case "3", "High Yield/Inflation"
+            Range("C13").Value = "Euro High Yield TR Index"
+            Range("D13").Value = "US High Yield TR Index"
+            Range("E13").Value = "IPC France"
+        Case "4", "Immo/Inflation"
+            Range("C13").Value = "Métropole Appart. CVS"
+            Range("D13").Value = "Paris Appart. CVS"
+            Range("E13").Value = "IPC France"
+        Case "5", "Zone Euro"
+            Range("C13").Value = "CAC 40 GR"
+            Range("D13").Value = "Euro High Yield TR Index"
+            Range("E13").Value = "Métropole Appart. CVS"
+        Case "6", "Zone US"
+            Range("C13").Value = "S&P 500 GR"
+            Range("D13").Value = "Or"
+            Range("E13").Value = "US High Yield TR Index"
+        Case Else
+            MsgBox "Catégorie non reconnue. Veuillez réessayer.", vbExclamation
+    End Select
+End Sub
+
+Sub TroisEnUn()
+    ' Exécuter les macros dans l'ordre
+    Call ChoixAutomatique
+    Call RecuperationAll
+    Call GraphiqueIndices_V2
+End Sub
+
