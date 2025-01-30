@@ -1,0 +1,92 @@
+Sub RecuperationIndices()
+
+    Dim sourceWB As Workbook
+    Dim currentWB As Workbook
+    Dim sourceFilePath As String
+
+     'Définir le chemin du fichier source
+    sourceFilePath = ThisWorkbook.Path & "\Indices_Datas.xlsx"
+
+    'Ouvrir le fichier source
+    On Error Resume Next
+    Set sourceWB = Workbooks.Open(sourceFilePath)
+    If sourceWB Is Nothing Then
+        MsgBox "Le fichier Indices_Datas.xlsx est introuvable."
+        Exit Sub
+    End If
+    On Error GoTo 0
+
+     'Définir le classeur courant
+    Set currentWB = ThisWorkbook
+
+    'Copier les colonnes A à D du fichier source vers l'onglet "Datas" du classeur actuel
+    sourceWB.Sheets(1).Range("A:D").Copy
+    currentWB.Sheets("Datas").Range("A1").PasteSpecial Paste:=xlPasteValues
+
+    'Fermer le fichier source sans enregistrer
+    sourceWB.Close SaveChanges:=False
+
+    'Message de confirmation
+    MsgBox "Données récupérées avec succès."
+
+End Sub
+
+Sub RecuperationAll()
+    Dim sourceWB As Workbook
+    Dim currentWB As Workbook
+    Dim sourceFilePath As String
+    Dim selectedTitles As Variant
+    Dim colIndex As Integer
+    Dim wsSource As Worksheet
+    Dim wsDest As Worksheet
+    Dim lastRow As Long
+    Dim ys As Worksheet
+    
+    Set ys = ThisWorkbook.Worksheets("Interface")
+
+    ' Définir le chemin du fichier source
+    sourceFilePath = ThisWorkbook.Path & "\All_Datas.xlsx"
+
+    ' Ouvrir le fichier source
+    On Error Resume Next
+    Set sourceWB = Workbooks.Open(sourceFilePath)
+    If sourceWB Is Nothing Then
+        MsgBox "Le fichier All_Datas.xlsx est introuvable dans le dossier Datas.", vbCritical
+        Exit Sub
+    End If
+    On Error GoTo 0
+
+    ' Définir les feuilles source et destination
+    Set wsSource = sourceWB.Sheets(1)
+    Set wsDest = ThisWorkbook.Sheets("Datas")
+
+    ' Copier la colonne A (Dates)
+    wsSource.Columns("A").Copy
+    wsDest.Columns("A").PasteSpecial Paste:=xlPasteValues
+
+    ' Récupérer les titres sélectionnés
+    selectedTitles = Array(ys.Range("C13").Value, ys.Range("D13").Value, ys.Range("E13").Value)
+
+    ' Copier les colonnes correspondant aux titres sélectionnés
+    For colIndex = 1 To UBound(selectedTitles) + 1
+    Dim foundCell As Range
+    ' Rechercher le titre dans la première ligne de wsSource
+    Set foundCell = wsSource.Rows(1).Find(What:=selectedTitles(colIndex - 1), LookIn:=xlValues, LookAt:=xlWhole)
+    
+    If Not foundCell Is Nothing Then
+        ' Si le titre est trouvé, copier la colonne correspondante
+        foundCell.EntireColumn.Copy
+        wsDest.Columns(colIndex + 1).PasteSpecial Paste:=xlPasteValues
+    Else
+        ' Si le titre n'est pas trouvé, afficher un message d'avertissement
+        MsgBox "Le titre '" & selectedTitles(colIndex - 1) & "' n'a pas été trouvé dans All_Datas.xlsx.", vbExclamation
+    End If
+Next colIndex
+
+    ' Fermer le fichier source sans enregistrer
+    sourceWB.Close SaveChanges:=False
+
+    ' Message de confirmation
+    MsgBox "Données récupérées avec succès.", vbInformation
+End Sub
+
