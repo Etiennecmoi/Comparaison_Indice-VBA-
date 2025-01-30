@@ -10,3 +10,5 @@ Maximum Drawdown: Calculates the largest peak-to-trough decline.
 Chart Enhancements: Logarithmic scale option and improved axis limits.
 Data Source Selection: Choose from different datasets (indices with dividends, asset classes).
 Automated Data Selection: Automatically selects relevant data based on categories.
+
+![image](https://github.com/user-attachments/assets/4af3f7a6-0f50-422a-806f-b4be35b2c788)
