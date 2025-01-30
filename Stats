@@ -1,0 +1,47 @@
+Option Explicit
+
+Option Base 1
+
+Function MaxDD(colonneIndice As Integer, ligneDebut As Long, ligneFin As Long) As Double
+    Dim ws As Worksheet
+    Dim i As Long
+    Dim valeurMax As Double
+    Dim drawdown As Double
+    Dim drawdownMax As Double
+    Dim valeurs() As Double
+
+    ' Définir la feuille contenant les données rebasées
+    Set ws = ThisWorkbook.Worksheets("DatasRebased")
+
+    ' Redimensionner le tableau pour stocker les valeurs de l'indice
+    ReDim valeurs(ligneDebut To ligneFin)
+
+    ' Remplir le tableau avec les données de l'indice
+    For i = ligneDebut To ligneFin
+        valeurs(i) = ws.Cells(i, colonneIndice).Value
+    Next i
+
+    ' Initialiser les variables
+    valeurMax = valeurs(ligneDebut)
+    drawdownMax = 0
+
+    ' Calculer le Maximum Drawdown
+    For i = ligneDebut + 1 To ligneFin
+        If valeurs(i) > valeurMax Then
+            valeurMax = valeurs(i)
+        End If
+
+        ' Calcul du drawdown en pourcentage
+        drawdown = (valeurs(i) - valeurMax) / valeurMax
+
+        ' Mise à jour du drawdown maximum si le drawdown actuel est plus important
+        If drawdown < drawdownMax Then
+            drawdownMax = drawdown
+        End If
+    Next i
+
+    ' Retourner le Maximum Drawdown sous forme de pourcentage positif
+    MaxDD = Abs(drawdownMax)
+
+End Function
+
